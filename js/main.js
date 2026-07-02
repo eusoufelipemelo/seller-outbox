@@ -98,6 +98,53 @@
   }
   initTextEffect();
 
+  /* ---- Depoimentos (marquee 3D) ---- */
+  var TESTI = [
+    { n: 'Mariana Alves', r: 'Consultora, Curitiba PR', q: 'Nunca tinha vendido nada na vida. Em três meses fechei meu primeiro site e a comissão caiu certinho. Aprendi do zero com a OutBox.' },
+    { n: 'Rafael Nogueira', r: 'Consultor, Belo Horizonte MG', q: 'Já vivia de vendas, mas aqui eu tenho produto bom pra oferecer e o sistema faz o resto. Minha comissão cresce todo mês.' },
+    { n: 'Juliana Prado', r: 'Consultora, Recife PE', q: 'O treinamento é de verdade. Os quizzes me deram segurança pra conversar com o cliente sem medo.' },
+    { n: 'Diego Martins', r: 'Consultor, Porto Alegre RS', q: 'Bati a meta do trimestre e escolhi receber o valor do prêmio em dinheiro. Caiu na conta como combinado.' },
+    { n: 'Camila Ferreira', r: 'Consultora, Fortaleza CE', q: 'O funil e os orçamentos dentro do sistema mudaram meu jogo. Fechei duas propostas na mesma semana.' },
+    { n: 'Bruno Carvalho', r: 'Consultor, São Paulo SP', q: 'Recorrência é o segredo. A hospedagem me paga todo mês sem eu precisar vender de novo.' },
+    { n: 'Patrícia Ramos', r: 'Consultora, Goiânia GO', q: 'Comecei desconfiada e hoje é a minha renda principal. O acompanhamento é nota dez.' },
+    { n: 'Thiago Souza', r: 'Consultor, Salvador BA', q: 'Passei no certificado, comecei a oferecer e não parei mais. Vale cada minuto de estudo.' },
+    { n: 'Letícia Barros', r: 'Consultora, Florianópolis SC', q: 'O que eu mais gosto é a transparência. Vejo minha comissão disponível em tempo real.' }
+  ];
+
+  function escapeHTML(s) {
+    return s.replace(/[&<>"]/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+    });
+  }
+
+  function testiCard(t) {
+    var star = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.9 6.26 6.86.62-5.18 4.55 1.55 6.72L12 17.1l-6.13 3.65 1.55-6.72L2.24 8.88l6.86-.62z"/></svg>';
+    return '<article class="testi-card">' +
+      '<div class="testi-head"><span class="testi-av">' + escapeHTML(t.n.charAt(0)) + '</span>' +
+      '<div class="testi-id"><strong>' + escapeHTML(t.n) + '</strong><span>' + escapeHTML(t.r) + '</span></div></div>' +
+      '<div class="testi-stars">' + star + star + star + star + star + '</div>' +
+      '<p class="testi-quote">' + escapeHTML(t.q) + '</p></article>';
+  }
+
+  function initTestimonials() {
+    var host = document.getElementById('testi-cols');
+    if (!host) return;
+    var durs = ['34s', '42s', '38s', '46s'];
+    for (var c = 0; c < 4; c++) {
+      var col = document.createElement('div');
+      col.className = 'testi-col';
+      var track = document.createElement('div');
+      track.className = 'testi-track ' + (c % 2 ? 'down' : 'up');
+      track.style.setProperty('--dur', durs[c]);
+      var items = TESTI.slice(c * 2).concat(TESTI.slice(0, c * 2));
+      var html = items.map(testiCard).join('');
+      track.innerHTML = html + html; // duplica para loop contínuo
+      col.appendChild(track);
+      host.appendChild(col);
+    }
+  }
+  initTestimonials();
+
   // Dispara os headlines que já estão na dobra sem depender de IO, garantindo que o
   // hero acima da dobra nunca fique em branco. rAF anima suave no load normal; o
   // setTimeout é rede de segurança caso o rAF esteja pausado (aba em segundo plano).
