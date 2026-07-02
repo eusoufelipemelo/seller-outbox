@@ -314,6 +314,7 @@ section{position:relative}
 
 /* ---------- Text effect (reveal palavra por palavra: blur + slide) ---------- */
 [data-te] .te-line{display:block}
+.te-cgroup{display:inline-block;white-space:pre}
 .te-word{display:inline-block;white-space:pre;opacity:0;transform:translateY(.55em);filter:blur(10px);transition:opacity .7s var(--ease),transform .7s var(--ease),filter .7s var(--ease);transition-delay:var(--te-d,0s);will-change:opacity,transform,filter}
 .te-in .te-word{opacity:1;transform:none;filter:blur(0)}
 .te-grad .te-word{background:linear-gradient(100deg,var(--orange) 0%,var(--orange-2) 50%,var(--orange-3) 100%);-webkit-background-clip:text;background-clip:text;color:transparent}

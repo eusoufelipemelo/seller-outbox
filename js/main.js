@@ -56,11 +56,12 @@
     document.querySelectorAll('[data-te]').forEach(function (el) {
       if (el.dataset.teReady) return;
       el.dataset.teReady = '1';
+      var per = el.getAttribute('data-te-per') || 'word';
       var baseDelay = parseFloat(el.getAttribute('data-te-delay') || '0') / 1000;
-      var stagger = parseFloat(el.getAttribute('data-te-stagger') || '60') / 1000;
+      var stagger = parseFloat(el.getAttribute('data-te-stagger') || (per === 'char' ? '22' : '60')) / 1000;
       var lines = el.querySelectorAll('.te-line');
       var targets = lines.length ? lines : [el];
-      var wordIndex = 0;
+      var i = 0;
       targets.forEach(function (line) {
         var text = line.textContent;
         line.textContent = '';
@@ -70,12 +71,27 @@
             line.appendChild(document.createTextNode(part));
             return;
           }
-          var w = document.createElement('span');
-          w.className = 'te-word';
-          w.textContent = part;
-          w.style.setProperty('--te-d', (baseDelay + wordIndex * stagger).toFixed(3) + 's');
-          wordIndex++;
-          line.appendChild(w);
+          if (per === 'char') {
+            // agrupa por palavra (inline-block) para não quebrar palavra no meio da linha
+            var group = document.createElement('span');
+            group.className = 'te-cgroup';
+            part.split('').forEach(function (ch) {
+              var c = document.createElement('span');
+              c.className = 'te-word';
+              c.textContent = ch;
+              c.style.setProperty('--te-d', (baseDelay + i * stagger).toFixed(3) + 's');
+              i++;
+              group.appendChild(c);
+            });
+            line.appendChild(group);
+          } else {
+            var w = document.createElement('span');
+            w.className = 'te-word';
+            w.textContent = part;
+            w.style.setProperty('--te-d', (baseDelay + i * stagger).toFixed(3) + 's');
+            i++;
+            line.appendChild(w);
+          }
         });
       });
     });
