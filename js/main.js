@@ -150,6 +150,80 @@
   }
   initTestimonials();
 
+  /* ---- Sistema: mockup que navega sozinho ---- */
+  function initSystemDemo() {
+    var mock = document.getElementById('sys-mock');
+    var featWrap = document.getElementById('sys-features');
+    if (!mock || !featWrap) return;
+    var reduceD = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var feats = [].slice.call(featWrap.querySelectorAll('.sys-feat'));
+    var navs = [].slice.call(mock.querySelectorAll('.mk-navi'));
+    var screens = [].slice.call(mock.querySelectorAll('.mk-screen'));
+    var cursor = mock.querySelector('.mk-cursor');
+    var comEl = mock.querySelector('#mk-com');
+    var STEPS = [
+      { feat: 0, screen: 'funil', nav: 1 },
+      { feat: 1, screen: 'orcamentos', nav: 2 },
+      { feat: 2, screen: 'visao', nav: 0, com: true },
+      { feat: 3, screen: 'clientes', nav: 3 },
+      { feat: 4, screen: 'visao', nav: 0, light: true }
+    ];
+    var idx = 0, timer = null;
+
+    function moveCursor(navEl) {
+      if (!cursor || !navEl) return;
+      var x = navEl.offsetLeft + navEl.offsetWidth - 28;
+      var y = navEl.offsetTop + navEl.offsetHeight / 2 - 5;
+      cursor.style.transform = 'translate(' + x + 'px,' + y + 'px)';
+      cursor.classList.remove('click');
+      setTimeout(function () { cursor.classList.add('click'); }, 640);
+    }
+    function comCount() {
+      if (!comEl) return;
+      var target = 2208, start = null, dur = 900;
+      function step(ts) {
+        if (!start) start = ts;
+        var p = Math.min((ts - start) / dur, 1);
+        var v = Math.round(target * (1 - Math.pow(1 - p, 3)));
+        comEl.textContent = 'R$ ' + v.toLocaleString('pt-BR');
+        if (p < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }
+    function apply(k) {
+      var s = STEPS[k];
+      feats.forEach(function (f, i) { f.classList.toggle('active', i === s.feat); });
+      screens.forEach(function (sc) { sc.classList.toggle('active', sc.getAttribute('data-screen') === s.screen); });
+      navs.forEach(function (n, i) { n.classList.toggle('active', i === s.nav); });
+      mock.classList.toggle('mock-light', !!s.light);
+      moveCursor(navs[s.nav]);
+      if (s.com) comCount();
+    }
+    function next() { idx = (idx + 1) % STEPS.length; apply(idx); }
+    function play() { stop(); timer = setInterval(next, 3200); }
+    function stop() { if (timer) { clearInterval(timer); timer = null; } }
+
+    feats.forEach(function (f, i) {
+      f.addEventListener('click', function () {
+        var k = 0;
+        for (var j = 0; j < STEPS.length; j++) { if (STEPS[j].feat === i) { k = j; break; } }
+        idx = k; apply(idx); if (!reduceD) play();
+      });
+    });
+
+    apply(0); // primeira tela sempre visível
+    if (reduceD) return;
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (es) {
+        es.forEach(function (e) { if (e.isIntersecting) play(); else stop(); });
+      }, { threshold: 0.25 });
+      io.observe(mock);
+    } else {
+      play();
+    }
+  }
+  initSystemDemo();
+
   // Dispara os headlines que já estão na dobra sem depender de IO, garantindo que o
   // hero acima da dobra nunca fique em branco. rAF anima suave no load normal; o
   // setTimeout é rede de segurança caso o rAF esteja pausado (aba em segundo plano).
