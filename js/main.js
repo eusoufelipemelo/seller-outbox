@@ -6,7 +6,7 @@
 
   /* ---- WhatsApp: monta o link com a mensagem ---- */
   var WPP_NUM = '5547996597775';
-  var WPP_MSG = 'Olá, vi que quer se tornar um consultor(a), me diga seu nome por favor!';
+  var WPP_MSG = 'Olá, quero me tornar um consultor(a) da OutBox.';
   var wppLink = 'https://wa.me/' + WPP_NUM + '?text=' + encodeURIComponent(WPP_MSG);
   document.querySelectorAll('[data-wpp]').forEach(function (a) {
     a.href = wppLink;
